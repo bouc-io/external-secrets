@@ -1,0 +1,20 @@
+# Raw Kubernetes manifests, not application source. The goal is catching real
+# breakage — syntax errors, duplicate keys, bad indentation — rather than enforcing
+# house style on manifests that are often derived from upstream examples.
+extends: relaxed
+
+# Vendored upstream releases are not ours to lint, and Helm `templates/` directories
+# hold Go templating rather than valid YAML.
+ignore: |
+  .git/
+  istio-*/
+  **/templates/
+
+rules:
+  # Manifests legitimately carry long annotation values and base64 blobs.
+  line-length: disable
+  comments: disable
+  comments-indentation: disable
+  document-start: disable
+  # Kubernetes uses bare on/off/yes/no as strings in plenty of upstream examples.
+  truthy: disable

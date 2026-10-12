@@ -1,0 +1,55 @@
+# RBAC for ESO's Kubernetes provider on pik8s.
+# The ClusterSecretStore authenticates as the ESO controller ServiceAccount
+# (external-secrets/external-secrets) and needs:
+#   1. read access to Secrets in the external-secrets namespace (the local
+#      file-store namespace), and
+#   2. permission to run a SelfSubjectRulesReview (cluster-scoped) which ESO
+#      uses to validate its own access before reading.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eso-secret-reader
+  namespace: external-secrets
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eso-secret-reader
+  namespace: external-secrets
+subjects:
+  - kind: ServiceAccount
+    name: external-secrets
+    namespace: external-secrets
+roleRef:
+  kind: Role
+  name: eso-secret-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# SelfSubjectRulesReview is a cluster-scoped (non-namespaced) resource, so a
+# namespaced Role cannot grant it — a ClusterRole is required.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eso-selfsubjectrulesreview
+rules:
+  - apiGroups: ["authorization.k8s.io"]
+    resources: ["selfsubjectrulesreviews"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: eso-selfsubjectrulesreview
+subjects:
+  - kind: ServiceAccount
+    name: external-secrets
+    namespace: external-secrets
+roleRef:
+  kind: ClusterRole
+  name: eso-selfsubjectrulesreview
+  apiGroup: rbac.authorization.k8s.io

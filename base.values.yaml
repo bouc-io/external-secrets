@@ -1,0 +1,40 @@
+# External Secrets Operator — base Helm values (common to all environments).
+# Chart: external-secrets (https://charts.external-secrets.io)
+#
+# Flux consumes this file through the Git submodule under
+# fluxcd/fluxcdboucio/clusters/components/external-secrets/. Edit here first,
+# validate, then bump the submodule. Per-environment overrides live in
+# lcl.values.yaml / snbx.values.yaml and are layered on top by the Flux HelmRelease
+# patch (valuesFrom: base-values then level-values).
+
+replicaCount: 1
+
+# Render the CRDs from the chart so Flux can manage them via the HelmRelease
+# install.crds: Create / upgrade.crds: CreateReplace policy.
+# Verified with chart 2.7.0: `installCRDs: true` renders all 24 ESO CRDs
+# (incl. clustersecretstores.external-secrets.io).
+installCRDs: true
+
+# Structured JSON logs per bouc.io logging standards (AGENTS.md).
+log:
+  level: info
+  timeEncoding: epoch
+
+serviceAccount:
+  create: true
+  # Default SA name is "external-secrets". The GKE Workload Identity annotation
+  # is added per-environment in snbx.values.yaml.
+  annotations: {}
+
+# Modest controller footprint; environments tune via their overlay.
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+# Prometheus ServiceMonitor disabled by default; enable per-env if the
+# Prometheus operator CRDs are present in that cluster.
+serviceMonitor:
+  enabled: false

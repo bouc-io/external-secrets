@@ -1,0 +1,16 @@
+include:
+  - template: SAST.gitlab-ci.yml
+  - template: Secret-Detection.gitlab-ci.yml
+  # Shared YAML lint job. Private project: the identity running the pipeline needs at
+  # least Reporter on bouc-io/ci-templates or the include fails to resolve.
+  - project: 'bouc-io/ci-templates'
+    ref: main
+    file: '/yaml.yml'
+
+stages:
+  - test
+
+# ── Quality gate. Job definition lives in the private bouc-io/ci-templates project
+# so a pipeline change is one commit instead of forty; see its README.
+lint:
+  extends: .yaml-lint

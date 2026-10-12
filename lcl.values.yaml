@@ -1,0 +1,20 @@
+# External Secrets Operator — LOCAL (pik8s) overlay.
+# Single-node Raspberry Pi / Jetson cluster: keep the footprint minimal.
+# Local uses the Kubernetes provider (no cloud auth), so no Workload Identity
+# annotation is needed here.
+
+replicaCount: 1
+
+# The operator ships three deployments (controller, webhook, cert-controller).
+# One replica each is plenty for local.
+webhook:
+  replicaCount: 1
+certController:
+  replicaCount: 1
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 192Mi

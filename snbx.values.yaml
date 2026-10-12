@@ -1,0 +1,16 @@
+# External Secrets Operator — SANDBOX (GKE) overlay.
+# The sandbox ClusterSecretStore uses the gcpsm provider with GKE Workload
+# Identity ("core controller" auth): the ESO controller's ServiceAccount is
+# annotated to impersonate the eso-gke Google service account. The matching
+# GCP-side IAM/WI binding is created manually — see README.md.
+#
+# ${GCP_PROJECT_ID} is substituted by Flux (postBuild.substituteFrom the
+# cluster-vars ConfigMap) when the level-values ConfigMap is generated.
+# Document the variable in fluxcd/fluxcdboucio/README.md.
+
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  annotations:
+    iam.gke.io/gcp-service-account: eso-gke@${GCP_PROJECT_ID}.iam.gserviceaccount.com

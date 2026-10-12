@@ -1,0 +1,14 @@
+# NOTE: externalsecrets/local/boucio-local-secrets.yaml is intentionally COMMITTED
+# so the local-eso-externalsecrets Flux Kustomization applies it (pik8s is not
+# internet-exposed). It is therefore NOT ignored here. If you switch to SOPS,
+# ignore the decrypted form instead.
+# The LOCAL source of REAL third-party credentials (Datadog key, Keycloak client
+# secrets, oauth2-proxy Redis password). Unlike boucio-local-secrets.yaml these
+# are live credentials for services outside the cluster, and this repo is
+# mirrored to a public GitHub remote, so the filled-in copy must never be
+# committed. Only the .example.yaml template is tracked.
+boucio-local-external-credentials.yaml
+
+*.dec.yaml
+**/.DS_Store
+.DS_Store
